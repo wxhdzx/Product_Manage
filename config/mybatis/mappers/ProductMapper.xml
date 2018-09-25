@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.product.manage.mapper.ProductMapper">
+	 
+	 <select id="queryAll" resultMap="productMap">
+		select p.*,c.c_name cName,c.c_id cId
+		from tb_category c,tb_product p
+		where c.c_id=p.p_cid
+		<if test="pName!=null">
+	 			and p.p_name like "%"#{pName}"%"
+	 	</if>
+	 	 <if test="pPrice!=null">
+	 		and p_price between #{minprice} and #{maxprice}
+	 	</if>
+		<if test="start !=null and pageSize!= null">
+			limit #{start},#{pageSize}
+		</if>
+	</select>
+	<resultMap type="com.product.manage.pojo.Product" id="productMap">
+		<id property="pId" column="p_id"/>
+		<result property="pName" column="p_name"/>
+		<result property="pPrice" column="p_price"/>
+		<result property="pImage" column="p_image"/>
+		<result property="pDate" column="p_date"/>
+		<result property="pDesc" column="p_desc"/>
+		<result property="pCid" column="p_cid"/>
+		<result property="pNumber" column="p_number"/>
+		<association property="category" javaType="com.product.manage.pojo.Category">
+			<id property="cId" column="cId"/>
+			<result property="cName" column="cName"/>
+		</association>
+	</resultMap>
+	
+	<!-- 查询总记录数 -->
+	<select id="queryCount" resultType="Integer">
+		select count(*) from tb_product
+	</select>
+	<!-- 保存数据 -->
+	<insert id="save" parameterType="com.product.manage.pojo.Product">
+		insert into tb_product(p_name,p_price,p_image,p_date,p_desc,p_cid,p_number) 
+		values(#{pName},#{pPrice},#{pImage},#{pDate},#{pDesc},#{pCid},#{pNumber})
+	</insert>
+	
+	<!-- 根据id查询 -->
+	<select id="selectById" resultMap="productMap">
+		select * from tb_product where p_id=#{pId}
+	</select>
+	
+	<!-- 根据id修改 -->
+	<select id="updateById" parameterType="com.product.manage.pojo.Product">
+		update tb_product set p_name=#{pName},p_price=#{pPrice},p_image=#{pImage},
+		p_desc=#{pDesc},p_cid=#{pCid},p_number=#{pNumber} where p_id=#{pId}
+	</select>
+	
+	<!-- 条件查询列表 -->
+	
+</mapper>
